@@ -1,4 +1,127 @@
 # install imagemagick with ghostscript
+
+sudo apt update && sudo apt upgrade
+sudo apt install libpng-dev libjpeg-dev libtiff-dev
+
+sudo apt-get install ghostscript
+sudo apt-get install imagemagick
+
+sudo apt install tesseract-ocr   
+tesseract --version   
+
+# setup policy
+## <policy domain="coder" rights="read|write" pattern="PDF" />
+## resource memory|disk to 4GiB
+
+sudo nano /etc/ImageMagick-6/policy.xml
+
+convert --version
+# 6.9? we are in convert space, not magick space???
+
+# split large PDFs into smaller ones 
+sudo apt-get install qpdf 
+
+qpdf --split-pages americandictiona01websrich.pdf V1-page.pdf
+qpdf --split-pages americandictiona02websrich.pdf V2-page.pdf
+
+# https://archive.org/stream/americandictiona01websrich#page/4/mode/2up
+# https://archive.org/stream/americandictiona02websrich#page/4/mode/2up
+# ORIGINAL FILES > 100 MB, so moved outside of REPO.
+
+# write PHP script to move single-page PDFs and render the necessary loops 
+
+## page.png 
+
+/home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V1-page-0022.pdf
+
+
+cd /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/
+mkdir ./V1-0022/
+cp V1-page-0022.pdf ./V1-0022/page.pdf
+
+convert -verbose -density 600 -quality 100 ./V1-0022/page.pdf ./V1-0022/page.png
+
+convert ./V1-0022/page.png -deskew 40 -format "%[deskew:angle]" info: > ./V1-0022/deskew.txt
+
+#convert ./V1-0022/page.png -rotate 0.321726 ./V1-0022/rotate.png
+convert ./V1-0022/page.png -distort SRT 0.321726 ./V1-0022/rotate.png
+
+sh /home/mshaffer/Documents/GitHub/1828/sandbox-1828/fred/textcleaner -g -e stretch -f 15 -o 5 ./V1-0022/rotate.png ./V1-0022/white.png
+
+tesseract -c tessedit_debug_fonts=1 --psm 1 ./V1-0022/white.png ./V1-0022/white -l eng hocr 
+
+
+# sudo apt install php-cli
+# need cli 
+
+
+##
+#Additionally, some users have noted that while tessedit_debug_fonts can be used to debug font recognition, it often outputs too much information at the character level, which is sent to stdout rather than the HOCR file.
+#This can make it difficult to extract meaningful font-related data from the output.
+
+#In some cases, the issue may be related to the version of Tesseract being used. For example, in Tesseract 4 and later versions, the ability to retrieve font information in HOCR format has been limited or changed, and users have reported that hocr_font_info 1 does not return the font name as expected.
+
+#Furthermore, it is important to note that font attribute recognition, including italic and bold, is primarily supported in the legacy engine (e.g., --oem 0), and not in the newer LSTM engine used in Tesseract 4 and later.
+#This means that if you are using the LSTM engine, you may not get accurate or reliable font attribute information, even with tessedit_debug_fonts enabled.
+
+#If you are experiencing issues with tessedit_debug_fonts not showing up in HOCR, it may be necessary to use the legacy engine or consider alternative approaches, such as training Tesseract on specific fonts to improve recognition accuracy.
+
+java -jar /home/mshaffer/Desktop/hocrViewer/JPageViewer.jar ./V1-0022/white.hocr ./V1-0022/white.png
+
+# sandbox-1828/data/V1-0001/page.pdf
+#                           page.png (quality 100)
+#							deskew.txt (angle)
+#							rotate.png (page + angle)
+#							white.png (rotate + white greyscale, fred's script)
+#							white.hocr (page-level HOCR with columns)
+
+
+# from above, I can then do some algorithm to identify words, page, column, with remainders spilling over ...
+	# maybe do hocr again at the word-level with legacy tools to identify bold/italic ... 
+	# it would be nice to "find the font" for the dictionary ... train with the specific font...
+	
+cd /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/	
+# 0.54
+convert ./V2-290/page.png -deskew 20 -format "%[deskew:angle]" info:
+convert ./V2-290/page.png -deskew 40 -format "%[deskew:angle]" info:
+convert ./V2-290/page.png -deskew 80 -format "%[deskew:angle]" info:
+
+# 5.34
+convert ./V2-290/white.png -deskew 20 -format "%[deskew:angle]" info:
+convert ./V2-290/white.png -deskew 40 -format "%[deskew:angle]" info:
+convert ./V2-290/white.png -deskew 80 -format "%[deskew:angle]" info:
+
+
+
+V2-889
+convert ./V2-889/page.png -deskew 20 -format "%[deskew:angle]" info:
+convert ./V2-889/page.png -deskew 40 -format "%[deskew:angle]" info:
+convert ./V2-889/page.png -deskew 80 -format "%[deskew:angle]" info:
+
+convert ./V2-889/white.png -deskew 20 -format "%[deskew:angle]" info:
+convert ./V2-889/white.png -deskew 40 -format "%[deskew:angle]" info:
+convert ./V2-889/white.png -deskew 80 -format "%[deskew:angle]" info:
+
+
+convert ./V2-549/rotate.png -distort SRT -1 ./V2-549/monte.png
+convert ./V2-549/rotate.png -distort SRT 1.1090257167816162 ./V2-549/monte2.png
+
+
+### https://stackoverflow.com/questions/28591117/how-do-i-segment-a-document-using-tesseract-then-output-the-resulting-bounding-b
+## hocrViewer... maybe an frame similar to what I did with mturk on patent documents, review the java implementation ...
+## load IMAGE, load HOCR, build result ... 
+# https://www.primaresearch.org/tools/PAGEViewer
+# sudo apt install default-jdk
+
+# sudo apt install python3 python3-pip
+
+# https://docs.scribeocr.com/tesseract_users.html
+
+# https://github.com/tesseract-ocr/tesseract/issues/2781
+# italics is now font-detection with new classifier?
+# tesseract 3 does bold/italics identification... newer version does not!
+
+# install imagemagick with ghostscript
 # debian will be a redo... using mshaffer username ...
 
 # https://linuxcapable.com/how-to-install-imagemagick-on-debian-linux/
