@@ -107,6 +107,157 @@ convert ./V2-549/rotate.png -distort SRT -1 ./V2-549/monte.png
 convert ./V2-549/rotate.png -distort SRT 1.1090257167816162 ./V2-549/monte2.png
 
 
+convert ./V2-549/page.png -distort SRT -0.269744873046875 ./V2-549/monte2.png
+convert ./V2-549/page.png -distort SRT 0.269744873046875 ./V2-549/monte3.png
+convert ./V2-549/page.png -distort SRT 5 ./V2-549/p5.png
+convert ./V2-549/p5.png -distort SRT -4.759155750274658 ./V2-549/p5reverse.png
+convert ./V2-549/page.png -distort SRT -0.017944183200597763 ./V2-549/rotate.png
+
+convert -verbose -density 600 -quality 100 ./V2-549/page.pdf ./V2-549/page.png
+python3 /home/mshaffer/Documents/GitHub/1828/-code-/run/php/projects/1828/skew-ai.py -i /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V2-549/page.png
+
+0.269744873046875
+convert ./V2-549/page.png -distort SRT 0.269744873046875 ./V2-549/rotate.png
+
+###
+
+python3 /home/mshaffer/Documents/GitHub/1828/-code-/run/php/projects/1828/skew-ai.py -i /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V1-0827/page.png
+
+# if zero, just do a copy
+convert ./V1-0827/page.png -distort SRT 0.0 ./V1-0827/rotate.png
+
+
+###
+convert -verbose -density 600 -quality 100 ./V2-225/page.pdf ./V2-225/page.png
+
+python3 /home/mshaffer/Documents/GitHub/1828/-code-/run/php/projects/1828/skew-ai.py -i /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V2-225/page.png
+
+# if zero, just do a copy
+convert ./V2-225/page.png -distort SRT 0.21346282958984375 ./V2-225/rotate.png
+
+
+###
+convert -verbose -density 600 -quality 100 ./V2-063/page.pdf ./V2-063/page.png
+
+python3 /home/mshaffer/Documents/GitHub/1828/-code-/run/php/projects/1828/skew-ai.py -i /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V2-063/page.png
+
+# if zero, just do a copy
+convert ./V2-063/page.png -distort SRT 0.8970413208007812 ./V2-063/rotate.png
+
+
+###
+convert -verbose -density 600 -quality 100 ./V2-644/page.pdf ./V2-644/page.png
+
+python3 /home/mshaffer/Documents/GitHub/1828/-code-/run/php/projects/1828/skew-ai.py -i /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V2-644/page.png
+
+# if zero, just do a copy
+convert ./V2-644/page.png -distort SRT 1.1070327758789062 ./V2-644/rotate.png
+
+V2-644
+
+
+
+
+
+
+
+
+
+
+
+convert ./V2-714/page.png -distort SRT 0.36540183424949646 ./V2-714/monte.png
+
+
+
+
+tesseract --psm 1 ./V1-0545/white.png ./V1-0545/monte -l eng hocr 
+
+# y
+convert ./V1-0545/rotate.png -threshold 50% -negate -crop x1 -format "%[fx:w*h*mean]\n" info:
+# x
+convert ./V1-0545/rotate.png -threshold 50% -negate -crop 1x -format "%[fx:w*h*mean]\n" info:
+# plot 
+convert ./V1-0545/rotate.png -threshold 50% -negate -crop 1x -format "%[fx:w*h*mean]\n" info: | gnuplot -e 'plot "-" using 1: xtic(1) with histogram' -persist
+# BINGO ... 3 columns 
+# find min values about 1/3 of the way and 2/3 of the way ... crop columns 
+
+
+convert ./V1-0545/rotate.png -threshold 50% -negate -crop 1x -format "%[fx:w*h*mean]\n" info: > ./V1-0545/horizontal.txt
+
+# BINGO, use 10 as minimum, reach 10, stays there ... wait until gets greater than 10 ... left/right of gutter 
+# 30-160 will be vertical column lines ... 
+# nonparametric smoothing? not loess, but kde = kernal density estimates 
+# search in 0.2-0.4 region 0.5-0.8 region for two minimum 
+
+889-908 is gutter 1 (about 20 pixels wide for V1, would be double that for V2)
+1724-1771 is gutter 2
+
+889 is first "1" or "0", so crop one pixel later 
+0-890
+908-1725 ... 1727
+1771-end 
+
+GIMP width = 890, offset = 0
+GIMP width = 819, offset = -908
+
+3rd one from the right 
+end = 2712
+1771 - 2712 = 941
+2712 - 890-819 = 1003, offset = 908 + 819 + 12? = 1739
+
+GIMP width = 941, offset = -1739
+
+
+# using R run script with libraries from command line
+# crop into columns after we find two minimum
+
+page.png
+rotate.png
+c1, c2, c3.png 
+white-c1, white-c2, white-c3.png
+c1.hocr, c2.hocr, c3.hocr
+
+tightly crop c1,c2,and c3 (begin/end analysis as well)
+store json object with crop parameters, so if we do a page-level HOCR overlay we have some offsets for each column (back to rotate.png)
+
+2564 is right column end 
+72 is left column begin (noise at beginning)
+
+each column is about 820 pixels wide ...
+
+
+# sudo apt install r-base r-base-dev -y
+ # my_script.R
+    library(ggplot2) # Load the ggplot2 library
+    # Your R code that uses ggplot2 functions
+    data <- data.frame(x = 1:10, y = rnorm(10))
+    print(ggplot(data, aes(x, y)) + geom_point())
+    
+    Rscript my_script.R
+    
+Rscript --vanilla ...
+write Rscript template, use PHP to do replaces?       
+
+
+
+
+
+
+
+# Additionally, if you need to ensure that the image's virtual canvas is properly handled, you can use the +repage option before and after the crop operation:
+convert input.jpg +repage -crop WxH+X+Y +repage output.jpg
+
+# X,Y = top-left
+# W, H = widtth--height 
+
+# create a font for 1828 Noah Webster
+# https://www.calligraphr.com/en/pricing/
+# https://fontforge.org/en-US/
+
+# /home/mshaffer/Documents/GitHub/1828/sandbox-1828/data/V1-0545/ ... has numbers 
+
+
+
 ### https://stackoverflow.com/questions/28591117/how-do-i-segment-a-document-using-tesseract-then-output-the-resulting-bounding-b
 ## hocrViewer... maybe an frame similar to what I did with mturk on patent documents, review the java implementation ...
 ## load IMAGE, load HOCR, build result ... 
